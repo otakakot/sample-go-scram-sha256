@@ -1,0 +1,65 @@
+openapi: "3.0.3"
+info:
+  title: "SCRAM-SHA256 認証 API"
+  version: "1.0.0"
+  description: >
+    このAPIは、SCRAM-SHA256認証のハンドシェイクを実現するためのエンドポイントを
+    提供します。クライアントは "client-first" および "client-final" の
+    メッセージを送信し、認証プロセスを完了します。
+  contact:
+    email: kotaro.otaka@example.com
+servers:
+  - url: "http://localhost:8080"
+tags:
+  - name: "SCRAM"
+    description: "SCRAM-SHA256 認証エンドポイント"
+paths:
+  /scram:
+    post:
+      tags:
+        - "SCRAM"
+      summary: "SCRAM 認証エンドポイント"
+      description: >
+        SCRAM認証のためのメッセージを受信し、認証処理を実行します。
+        サーバーはクライアントからのリクエストに基づき、
+        認証用のメッセージを返します。
+      operationId: "scram"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                step:
+                  type: string
+                  description: "SCRAMプロセスのステップ (例: client-first または client-final)"
+                  example: "client-first"
+                message:
+                  type: string
+                  description: "SCRAMメッセージの内容"
+                  example: "n,,n=user,r=abc123"
+              required:
+                - step
+                - message
+      responses:
+        "200":
+          description: "認証結果のレスポンス"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: "サーバーからの認証メッセージ"
+                    example: "r=abc123xyz,s=base64salt,i=4096"
+                  error:
+                    type: string
+                    description: "エラー詳細（エラーがない場合は空文字）"
+                    nullable: true
+                    example: ""
+        "400":
+          description: "不正なリクエストパラメータ"
+        "500":
+          description: "内部サーバーエラー"
