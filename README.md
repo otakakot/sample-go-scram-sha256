@@ -1,0 +1,1 @@
+# sample-go-scram-sha256
